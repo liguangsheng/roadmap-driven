@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agent Roadmap Execution"
+  short_description: "Drive agent work with roadmap sprints."
+  default_prompt: "Use $agent-roadmap-execution to organize this project, keep draft and planned statuses honest, and execute the next actionable sprint with validation evidence and a durable checkpoint."
