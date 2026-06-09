@@ -33,7 +33,9 @@ docs/roadmap/
     S001-next-sprint.md
 ```
 
-Keep any old flat `milestones.md`, `PLAN.md`, or `sprints/` file only as a compatibility entry if needed. The tree should be the authority once created.
+`docs/roadmap/` is only for roadmap control-plane documents: the root `README.md`, milestone directories, milestone `README.md` files, and sprint files named like `Sxxx-*.md`. Do not create or keep specifications, grammar docs, design docs, reports, release notes, implementation plans, evidence artifacts, status docs, feature profiles, or other auxiliary documents under `docs/roadmap/`; put them elsewhere such as `docs/` and link to them from the relevant milestone or sprint.
+
+If old flat `milestones.md`, `PLAN.md`, `sprints/`, or other non-roadmap files exist in `docs/roadmap/`, treat them as migration sources only. Move their non-milestone/sprint content out of `docs/roadmap/` when reorganizing, then make the tree the authority.
 
 ## Milestone Creation Guard
 
@@ -58,7 +60,7 @@ Use these sprint statuses consistently:
 - `planned`: sprint is executable but has not started.
 - `in-progress`: sprint is currently being worked.
 - `blocked`: sprint cannot continue without a decision, missing dependency, or failing prerequisite.
-- `done`: sprint Done criteria and validation commands have passed.
+- `done`: sprint Done criteria, validation commands, and completion audit have passed.
 
 Milestone status derives from sprint state:
 
@@ -75,7 +77,7 @@ Create or update `docs/roadmap/README.md` with:
 - tracking rules;
 - sprint status rules for pause/resume;
 - rule that future milestones remain `draft` until split into sprint files;
-- completion rule: sprint Done criteria plus milestone acceptance criteria must both pass.
+- completion rule: sprint Done criteria, validation commands, completion audit, and milestone acceptance criteria must all pass.
 
 ## Milestone README Template
 
@@ -161,6 +163,7 @@ Milestone: Mxx Title.
 ## Evidence
 
 - Validation:
+- Completion audit:
 - Commit:
 - Notes:
 
@@ -183,8 +186,9 @@ When asked to plan or reorganize:
 4. If flat milestones/sprints exist, migrate to `docs/roadmap/Mxx-*/` only when the user asked for roadmap setup or reorganization.
 5. Keep long-range milestones as `draft` unless they have executable sprints.
 6. Split only the next actionable milestone into sprint files.
-7. Update all links in README, implementation plans, and compatibility docs.
-8. Verify no stale paths remain with `rg`.
+7. Keep non-roadmap content out of `docs/roadmap/`; move specs, designs, reports, release notes, feature profiles, and evidence attachments to non-roadmap docs and link them from milestones or sprints.
+8. Update all links in README, implementation plans, and compatibility docs.
+9. Verify no stale paths remain with `rg`.
 
 When asked to execute:
 
@@ -196,11 +200,13 @@ When asked to execute:
 6. Execute sprint tasks in order.
 7. Update checklist status as work completes.
 8. Run validation commands.
-9. Record validation results in the sprint Evidence section.
-10. Mark sprint `done` only when Done criteria and validation pass.
-11. Update the owning milestone sprint status table.
-12. Mark milestone `done` only when every required sprint is done and acceptance criteria pass.
-13. If the project is in a Git repository, commit immediately after each sprint is marked `done`, before starting the next sprint. Keep generated build outputs out of the commit, use a commit message that names the completed sprint or milestone slice, and record the commit hash in the sprint Evidence section or milestone sprint table.
+9. Run a completion audit before marking the sprint `done`: reread the sprint Goal, Tasks, Done Criteria, Validation Commands, Out of Scope, changed files, tests, and relevant milestone Acceptance Criteria. Confirm the implemented behavior actually satisfies the stated target, not just that commands passed.
+10. If the audit finds gaps, keep the sprint `in-progress`, record the gap in Evidence/Notes or unchecked tasks, implement the missing work, rerun affected validation, and repeat the completion audit.
+11. Record validation and completion-audit results in the sprint Evidence section.
+12. Mark sprint `done` only when Done criteria, validation, and completion audit pass.
+13. Update the owning milestone sprint status table.
+14. Mark milestone `done` only when every required sprint is done and acceptance criteria pass.
+15. If the project is in a Git repository, commit immediately after each sprint is marked `done`, before starting the next sprint. Keep generated build outputs out of the commit, use a commit message that names the completed sprint or milestone slice, and record the commit hash in the sprint Evidence section or milestone sprint table.
 
 When pausing or handing off:
 
@@ -218,4 +224,5 @@ When pausing or handing off:
 - A milestone README must track sprint status so work can pause and resume without reconstructing context from chat.
 - Avoid detailed sprint planning for far-future milestones; it drifts before execution.
 - Prefer repo-local docs and checklists over chat-only plans.
+- Treat validation as necessary but not sufficient: each sprint must pass a target-focused completion audit before it is done, and any discovered gap must be closed inside that sprint unless it is explicitly out of scope or blocked.
 - For Git-backed projects, sprint completion is not fully durable until the verified sprint changes are committed separately from later sprint work.

@@ -29,10 +29,11 @@ $agent-roadmap-execution
 
 - Milestones represent phase goals and acceptance gates.
 - Sprints represent executable, verifiable, resumable task slices.
+- `docs/roadmap/` contains only roadmap control-plane documents: the root `README.md`, milestone directories, milestone `README.md` files, and sprint files. Put specs, designs, reports, release notes, evidence attachments, and other auxiliary docs elsewhere under `docs/` and link to them.
 - Future milestones stay `draft` until split into executable sprint files.
 - Execution resumes from the first non-`done` sprint, preferring an existing `in-progress` sprint.
 - New milestones are not created during execution unless the user explicitly asks to expand, replan, split, or create roadmap scope.
-- Completed sprints must record validation evidence and, in Git repositories, be committed before moving to the next sprint.
+- Completed sprints must record validation evidence and pass a deep completion audit of the stated goal. If gaps remain, keep the sprint `in-progress`, close the gaps, then rerun validation and the audit. In Git repositories, commit before moving to the next sprint.
 
 ## How to Use
 
@@ -47,5 +48,5 @@ Notes:
 
 - Keep planning and route changes in the steering session. Do not let the execution session rewrite the roadmap ad hoc, or the two sessions may diverge on project state.
 - The execution session should resume the current `in-progress` sprint first; if none exists, it should start the first sprint that is not `done`.
-- After each completed sprint, record validation evidence. In Git repositories, commit the completed sprint before moving to the next one.
+- Before finishing each sprint, record validation evidence and audit the Goal, Tasks, Done Criteria, changed files, and relevant milestone acceptance criteria. If gaps remain, continue filling them instead of moving on just because commands passed. In Git repositories, commit the completed sprint before moving to the next one.
 - Use a strong model for roadmap execution, especially when the work involves cross-file edits, long-context recovery, and acceptance judgment.

@@ -37,10 +37,11 @@ $agent-roadmap-execution
 
 - Milestone 表示阶段目标和验收门槛。
 - Sprint 表示可执行、可验证、可恢复的任务切片。
+- `docs/roadmap/` 只放 roadmap 控制面文档：根 `README.md`、milestone 目录、milestone `README.md` 和 sprint 文件；规格、设计、报告、发布说明、证据附件等放到 `docs/` 其他位置再链接。
 - 未来 milestone 在拆分成可执行 sprint 文件前保持 `draft`。
 - 执行时从第一个非 `done` sprint 恢复，并优先恢复已有的 `in-progress` sprint。
 - 执行过程中不得创建新 milestone，除非用户明确要求扩展、重规划、拆分或创建 roadmap 范围。
-- 完成的 sprint 必须记录验证证据；如果项目是 Git 仓库，还必须在进入下一个 sprint 前完成提交。
+- 完成的 sprint 必须记录验证证据，并深度审计目标是否真正完成；如有缺口，保持 `in-progress` 并补齐后重新验证和审计。如果项目是 Git 仓库，还必须在进入下一个 sprint 前完成提交。
 
 ## 使用方法
 
@@ -55,5 +56,5 @@ $agent-roadmap-execution
 
 - 规划和路线调整尽量只在“方向盘”会话中完成，不要让“发动机”会话临场改 roadmap，避免两个会话对项目状态产生分歧。
 - “发动机”会话应优先执行当前 `in-progress` sprint；如果没有，则执行第一个非 `done` sprint。
-- 每个 sprint 完成后，都要记录验证证据；如果项目是 Git 仓库，还应先提交再进入下一个 sprint。
+- 每个 sprint 完成前，都要记录验证证据并审计 Goal、Tasks、Done Criteria、变更文件和相关 milestone 验收条件；发现缺口就继续补齐，不能只因为命令通过就进入下一个 sprint。如果项目是 Git 仓库，还应先提交再进入下一个 sprint。
 - 建议使用能力较强的模型执行 roadmap 工作，尤其是涉及跨文件修改、长期上下文恢复和验收判断时。
