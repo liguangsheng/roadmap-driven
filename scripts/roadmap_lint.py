@@ -16,6 +16,7 @@ MILESTONE_DIR_RE = re.compile(r"^M\d+(?:\.\d+)?-.+$")
 SPRINT_FILE_RE = re.compile(r"^S\d+(?:\.\d+)?-.+\.md$")
 STATUS_RE = re.compile(r"^Status:\s*`?([A-Za-z-]+)`?\s*$", re.MULTILINE)
 LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
+DEFAULT_ROADMAP = ".agents/roadmap"
 
 
 @dataclass(frozen=True)
@@ -27,18 +28,18 @@ class Issue:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Validate docs/roadmap layout, links, statuses, and resume points."
+        description="Validate roadmap layout, links, statuses, and resume points."
     )
     parser.add_argument(
         "repo_root",
         nargs="?",
         default=".",
-        help="Repository root containing docs/roadmap. Defaults to current directory.",
+        help="Repository root containing .agents/roadmap by default.",
     )
     parser.add_argument(
         "--roadmap",
-        default="docs/roadmap",
-        help="Roadmap path relative to repo root. Defaults to docs/roadmap.",
+        default=DEFAULT_ROADMAP,
+        help=f"Roadmap path relative to repo root. Defaults to {DEFAULT_ROADMAP}.",
     )
     parser.add_argument(
         "--allow-missing",
@@ -117,7 +118,9 @@ def check_links(path: Path, repo_root: Path, issues: list[Issue]) -> None:
             issues.append(Issue("ERROR", path, f"broken markdown link: {href}"))
 
 
-def check_layout(roadmap_root: Path, issues: list[Issue]) -> list[Path]:
+def check_layout(
+    roadmap_root: Path, roadmap_label: str, issues: list[Issue]
+) -> list[Path]:
     milestone_dirs: list[Path] = []
     for child in sorted(roadmap_root.iterdir()):
         if child.name == "README.md" and child.is_file():
@@ -129,7 +132,7 @@ def check_layout(roadmap_root: Path, issues: list[Issue]) -> list[Path]:
             Issue(
                 "ERROR",
                 child,
-                "unexpected item in docs/roadmap; only README.md and Mxx-* milestone directories are allowed",
+                f"unexpected item in {roadmap_label}; only README.md and Mxx-* milestone directories are allowed",
             )
         )
 
@@ -338,14 +341,21 @@ def main() -> int:
         if args.allow_missing:
             print(f"roadmap-lint: {rel(roadmap_root, repo_root)} missing; skipped")
             return 0
-        print(f"roadmap-lint: {rel(roadmap_root, repo_root)} does not exist", file=sys.stderr)
+        legacy_roadmap = repo_root / "docs/roadmap"
+        suffix = ""
+        if args.roadmap == DEFAULT_ROADMAP and legacy_roadmap.exists():
+            suffix = "; legacy docs/roadmap exists, migrate it or rerun with --roadmap docs/roadmap"
+        print(
+            f"roadmap-lint: {rel(roadmap_root, repo_root)} does not exist{suffix}",
+            file=sys.stderr,
+        )
         return 1
 
     if not roadmap_root.is_dir():
         print(f"roadmap-lint: {rel(roadmap_root, repo_root)} is not a directory", file=sys.stderr)
         return 1
 
-    milestone_dirs = check_layout(roadmap_root, issues)
+    milestone_dirs = check_layout(roadmap_root, args.roadmap, issues)
     check_root_readme(roadmap_root, milestone_dirs, issues)
 
     active_sprints: list[Path] = []

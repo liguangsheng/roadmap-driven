@@ -1,6 +1,6 @@
 ---
 name: agent-roadmap-execution
-description: Use when a user wants an AI coding agent to plan, organize, or execute multi-session roadmap work using milestone directories, executable sprint files, validation evidence, and per-sprint commits; applies to roadmap structure, milestone/sprint mapping, draft vs planned status, implementation sequencing, pause/resume handoffs, and keeping project plans, docs, and execution evidence aligned.
+description: Use when a user wants an AI coding agent to plan, organize, or execute multi-session roadmap work using `.agents/roadmap` milestone directories, executable sprint files, validation evidence, and per-sprint commits; applies to roadmap structure, milestone/sprint mapping, draft vs planned status, implementation sequencing, pause/resume handoffs, and keeping project plans, docs, and execution evidence aligned.
 ---
 
 # Agent Roadmap Execution
@@ -12,6 +12,8 @@ This workflow borrows milestone and sprint terminology, but does not implement S
 Use it for multi-step, multi-session, or roadmap-driven work. Do not create roadmap structure for trivial one-shot fixes unless the user asks.
 
 When this skill's bundled scripts are available, use `scripts/roadmap_lint.py` to check roadmap structure after creating, reorganizing, or updating roadmap status. If the script is unavailable or Python cannot run, perform the same checks manually and record the limitation.
+
+The default roadmap root is `.agents/roadmap/`. Treat `docs/roadmap/` as a legacy location unless the user or repository explicitly opts into it.
 
 ## Core Model
 
@@ -25,7 +27,7 @@ Milestones own sprints. A sprint must live under the milestone it serves.
 Recommended layout:
 
 ```txt
-docs/roadmap/
+.agents/roadmap/
   README.md
   M00-short-name/
     README.md
@@ -35,9 +37,9 @@ docs/roadmap/
     S001-next-sprint.md
 ```
 
-`docs/roadmap/` is only for roadmap control-plane documents: the root `README.md`, milestone directories, milestone `README.md` files, and sprint files named like `Sxxx-*.md`. Do not create or keep specifications, grammar docs, design docs, reports, release notes, implementation plans, evidence artifacts, status docs, feature profiles, or other auxiliary documents under `docs/roadmap/`; put them elsewhere such as `docs/` and link to them from the relevant milestone or sprint.
+`.agents/roadmap/` is only for roadmap control-plane documents: the root `README.md`, milestone directories, milestone `README.md` files, and sprint files named like `Sxxx-*.md`. Do not create or keep specifications, grammar docs, design docs, reports, release notes, implementation plans, evidence artifacts, status docs, feature profiles, or other auxiliary documents under `.agents/roadmap/`; put them elsewhere such as `docs/` or another appropriate project directory and link to them from the relevant milestone or sprint.
 
-If old flat `milestones.md`, `PLAN.md`, `sprints/`, or other non-roadmap files exist in `docs/roadmap/`, treat them as migration sources only. Move their non-milestone/sprint content out of `docs/roadmap/` when reorganizing, then make the tree the authority.
+If old flat `milestones.md`, `PLAN.md`, `sprints/`, legacy `docs/roadmap/`, or other non-roadmap files exist, treat them as migration sources only. Move roadmap control-plane content into `.agents/roadmap/` when reorganizing, move non-roadmap content outside `.agents/roadmap/`, then make the tree the authority.
 
 ## Milestone Creation Guard
 
@@ -72,7 +74,7 @@ Milestone status derives from sprint state:
 
 ## Roadmap README
 
-Create or update `docs/roadmap/README.md` with:
+Create or update `.agents/roadmap/README.md` with:
 
 - status definitions;
 - milestone table linking to each `Mxx-*/README.md`;
@@ -210,10 +212,10 @@ When asked to plan or reorganize:
 1. Inspect existing docs and tree first.
 2. Identify the authoritative planning surface.
 3. Confirm the request explicitly permits roadmap expansion before creating any new milestone.
-4. If flat milestones/sprints exist, migrate to `docs/roadmap/Mxx-*/` only when the user asked for roadmap setup or reorganization.
+4. If flat milestones/sprints or legacy `docs/roadmap/` files exist, migrate to `.agents/roadmap/Mxx-*/` only when the user asked for roadmap setup or reorganization.
 5. Keep long-range milestones as `draft` unless they have executable sprints.
 6. Split only the next actionable milestone into sprint files.
-7. Keep non-roadmap content out of `docs/roadmap/`; move specs, designs, reports, release notes, feature profiles, and evidence attachments to non-roadmap docs and link them from milestones or sprints.
+7. Keep non-roadmap content out of `.agents/roadmap/`; move specs, designs, reports, release notes, feature profiles, and evidence attachments to non-roadmap docs and link them from milestones or sprints.
 8. Update all links in README, implementation plans, and compatibility docs.
 9. Verify no stale paths remain with `rg`.
 10. Run `python <skill-dir>/scripts/roadmap_lint.py <repo-root>` when available; otherwise manually check for invalid statuses, broken links, misplaced files, multiple active sprints, and Resume Point drift.

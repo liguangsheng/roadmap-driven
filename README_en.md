@@ -10,7 +10,7 @@ The skill is designed for repositories where work needs to be paused and resumed
 
 - `SKILL.md`: the skill definition and operating workflow.
 - `agents/openai.yaml`: UI metadata for Codex skill lists and default invocation.
-- `scripts/roadmap_lint.py`: checks `docs/roadmap/` structure, statuses, links, Resume Point text, and active sprint count.
+- `scripts/roadmap_lint.py`: checks `.agents/roadmap/` structure, statuses, links, Resume Point text, and active sprint count.
 
 ## Install
 
@@ -30,7 +30,8 @@ $agent-roadmap-execution
 
 - Milestones represent phase goals and acceptance gates.
 - Sprints represent executable, verifiable, resumable task slices.
-- `docs/roadmap/` contains only roadmap control-plane documents: the root `README.md`, milestone directories, milestone `README.md` files, and sprint files. Put specs, designs, reports, release notes, evidence attachments, and other auxiliary docs elsewhere under `docs/` and link to them.
+- `.agents/roadmap/` contains only roadmap control-plane documents: the root `README.md`, milestone directories, milestone `README.md` files, and sprint files. Put specs, designs, reports, release notes, evidence attachments, and other auxiliary docs elsewhere under `docs/` or another appropriate project directory and link to them.
+- Legacy `docs/roadmap/` is treated as a migration source. Reorganize roadmap files into `.agents/roadmap/` unless the repository explicitly opts into the old path.
 - Future milestones stay `draft` until split into executable sprint files.
 - Execution resumes from the first non-`done` sprint, preferring an existing `in-progress` sprint.
 - New milestones are not created during execution unless the user explicitly asks to expand, replan, split, or create roadmap scope.
@@ -51,5 +52,5 @@ Notes:
 - Keep planning and route changes in the steering session. Do not let the execution session rewrite the roadmap ad hoc, or the two sessions may diverge on project state.
 - The execution session should resume the current `in-progress` sprint first; if none exists, it should start the first sprint that is not `done`.
 - Before finishing each sprint, record validation evidence and audit the Goal, Tasks, Done Criteria, changed files, and relevant milestone acceptance criteria. If gaps remain, continue filling them instead of moving on just because commands passed. In Git repositories, commit the completed sprint before moving to the next one.
-- If the installed skill directory is available, run `python ~/.codex/skills/agent-roadmap-execution/scripts/roadmap_lint.py .` in the target repository to check roadmap structure. Add `--allow-missing` for a non-blocking check before `docs/roadmap/` exists.
+- If the installed skill directory is available, run `python ~/.codex/skills/agent-roadmap-execution/scripts/roadmap_lint.py .` in the target repository to check roadmap structure. Add `--allow-missing` for a non-blocking check before `.agents/roadmap/` exists; use `--roadmap docs/roadmap` to validate legacy projects explicitly.
 - Use a strong model for roadmap execution, especially when the work involves cross-file edits, long-context recovery, and acceptance judgment.
