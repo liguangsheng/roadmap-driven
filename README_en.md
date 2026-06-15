@@ -10,6 +10,7 @@ The skill is designed for repositories where work needs to be paused and resumed
 
 - `SKILL.md`: the skill definition and operating workflow.
 - `agents/openai.yaml`: UI metadata for Codex skill lists and default invocation.
+- `scripts/roadmap_lint.py`: checks `docs/roadmap/` structure, statuses, links, Resume Point text, and active sprint count.
 
 ## Install
 
@@ -34,6 +35,7 @@ $agent-roadmap-execution
 - Execution resumes from the first non-`done` sprint, preferring an existing `in-progress` sprint.
 - New milestones are not created during execution unless the user explicitly asks to expand, replan, split, or create roadmap scope.
 - Completed sprints must record validation evidence and pass a deep completion audit of the stated goal. If gaps remain, keep the sprint `in-progress`, close the gaps, then rerun validation and the audit. In Git repositories, commit before moving to the next sprint.
+- After creating, reorganizing, or updating roadmap status, run `scripts/roadmap_lint.py` when available. If it cannot run, manually check the same items and state the limitation.
 
 ## How to Use
 
@@ -49,4 +51,5 @@ Notes:
 - Keep planning and route changes in the steering session. Do not let the execution session rewrite the roadmap ad hoc, or the two sessions may diverge on project state.
 - The execution session should resume the current `in-progress` sprint first; if none exists, it should start the first sprint that is not `done`.
 - Before finishing each sprint, record validation evidence and audit the Goal, Tasks, Done Criteria, changed files, and relevant milestone acceptance criteria. If gaps remain, continue filling them instead of moving on just because commands passed. In Git repositories, commit the completed sprint before moving to the next one.
+- If the installed skill directory is available, run `python ~/.codex/skills/agent-roadmap-execution/scripts/roadmap_lint.py .` in the target repository to check roadmap structure. Add `--allow-missing` for a non-blocking check before `docs/roadmap/` exists.
 - Use a strong model for roadmap execution, especially when the work involves cross-file edits, long-context recovery, and acceptance judgment.

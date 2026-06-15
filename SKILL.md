@@ -11,6 +11,8 @@ This workflow borrows milestone and sprint terminology, but does not implement S
 
 Use it for multi-step, multi-session, or roadmap-driven work. Do not create roadmap structure for trivial one-shot fixes unless the user asks.
 
+When this skill's bundled scripts are available, use `scripts/roadmap_lint.py` to check roadmap structure after creating, reorganizing, or updating roadmap status. If the script is unavailable or Python cannot run, perform the same checks manually and record the limitation.
+
 ## Core Model
 
 ```txt
@@ -78,6 +80,7 @@ Create or update `docs/roadmap/README.md` with:
 - sprint status rules for pause/resume;
 - rule that future milestones remain `draft` until split into sprint files;
 - completion rule: sprint Done criteria, validation commands, completion audit, and milestone acceptance criteria must all pass.
+- lint rule: run the roadmap lint script when available after roadmap structure or status changes.
 
 ## Milestone README Template
 
@@ -133,6 +136,7 @@ Each sprint file must be directly executable:
 # Sxxx: Title
 
 Milestone: Mxx Title.
+Status: planned|in-progress|blocked|done
 
 ## Goal
 
@@ -176,7 +180,30 @@ Milestone: Mxx Title.
 - ...
 ```
 
+The sprint `Status:` line is recommended for new sprint files. Existing roadmaps may keep status only in the milestone sprint table, but when both exist they must agree.
+
+## Completion Audit Checklist
+
+Before marking a sprint `done`, verify and record each item:
+
+- Goal: the implemented behavior satisfies the sprint Goal, not only adjacent tasks.
+- Tasks: every checked task is actually implemented; incomplete tasks remain unchecked or are explicitly moved out of scope.
+- Done Criteria: each criterion has direct evidence.
+- Validation Commands: required commands ran, or the Evidence explains why a command could not run and what substituted for it.
+- Changed files: all agent-owned edits are relevant to the sprint; unrelated user changes remain untouched.
+- Milestone Acceptance Criteria: the sprint result advances or satisfies the owning milestone gate as expected.
+- Out of Scope: no excluded work was silently pulled into the sprint.
+- Evidence: validation, audit result, notes, and blockers are recorded in the sprint file or linked artifact.
+- Commit: in Git repositories, the completed sprint has its own commit before later sprint work begins.
+
 ## Operating Workflow
+
+Choose the mode from the user's request before editing:
+
+- plan/reorganize: create or reshape roadmap structure only when the user asks for planning, setup, reorganization, expansion, or splitting.
+- execute: continue from the current `Resume Point`, prefer the active `in-progress` sprint, and avoid changing roadmap scope.
+- recover/audit: when the user reports drift, missing work, or questionable completion, inspect current evidence before changing statuses.
+- inspect/report: when the user asks for status, summarize roadmap state without editing unless the request clearly asks for fixes.
 
 When asked to plan or reorganize:
 
@@ -189,6 +216,7 @@ When asked to plan or reorganize:
 7. Keep non-roadmap content out of `docs/roadmap/`; move specs, designs, reports, release notes, feature profiles, and evidence attachments to non-roadmap docs and link them from milestones or sprints.
 8. Update all links in README, implementation plans, and compatibility docs.
 9. Verify no stale paths remain with `rg`.
+10. Run `python <skill-dir>/scripts/roadmap_lint.py <repo-root>` when available; otherwise manually check for invalid statuses, broken links, misplaced files, multiple active sprints, and Resume Point drift.
 
 When asked to execute:
 
@@ -200,13 +228,14 @@ When asked to execute:
 6. Execute sprint tasks in order.
 7. Update checklist status as work completes.
 8. Run validation commands.
-9. Run a completion audit before marking the sprint `done`: reread the sprint Goal, Tasks, Done Criteria, Validation Commands, Out of Scope, changed files, tests, and relevant milestone Acceptance Criteria. Confirm the implemented behavior actually satisfies the stated target, not just that commands passed.
+9. Run the completion audit checklist before marking the sprint `done`. Confirm the implemented behavior actually satisfies the stated target, not just that commands passed.
 10. If the audit finds gaps, keep the sprint `in-progress`, record the gap in Evidence/Notes or unchecked tasks, implement the missing work, rerun affected validation, and repeat the completion audit.
 11. Record validation and completion-audit results in the sprint Evidence section.
-12. Mark sprint `done` only when Done criteria, validation, and completion audit pass.
+12. Mark sprint `done` only when Done criteria, validation, and completion audit pass. Keep the sprint file `Status:` and milestone sprint table consistent when both exist.
 13. Update the owning milestone sprint status table.
 14. Mark milestone `done` only when every required sprint is done and acceptance criteria pass.
-15. If the project is in a Git repository, commit immediately after each sprint is marked `done`, before starting the next sprint. Keep generated build outputs out of the commit, use a commit message that names the completed sprint or milestone slice, and record the commit hash in the sprint Evidence section or milestone sprint table.
+15. Run `python <skill-dir>/scripts/roadmap_lint.py <repo-root>` when available after status changes.
+16. If the project is in a Git repository, commit immediately after each sprint is marked `done`, before starting the next sprint. Keep generated build outputs out of the commit, use a commit message that names the completed sprint or milestone slice, and record the commit hash in the sprint Evidence section or milestone sprint table.
 
 When pausing or handing off:
 
