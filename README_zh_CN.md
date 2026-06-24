@@ -34,6 +34,7 @@ opencode 也会读取 `~/.claude/skills/`，所以装到 Claude Code 目录后 o
 - `agents/openai.yaml`：Codex 专用的 UI 元数据，用于 skill 列表和默认调用提示。
 - `scripts/roadmap_lint.py`：检查 `.agents/roadmap/` 的结构、状态、链接、Resume Point 和 active sprint 数量。
 - `install.sh`：从本地或远程来源把 skill 安装到一个或多个 agent skills 目录，支持复制或符号链接，并自带安装后校验。
+- `uninstall.sh`：从已安装的 agent skills 目录中移除这个 skill。
 
 ## 手动安装
 
@@ -78,6 +79,23 @@ curl -fsSL https://raw.githubusercontent.com/liguangsheng/roadmap-driven/main/in
 ```txt
 $roadmap-driven
 ```
+
+## 卸载
+
+用自带的 `uninstall.sh` 卸载。默认会从所有可能的安装位置（Codex、Claude Code、opencode）移除 `roadmap-driven`：
+
+```bash
+./uninstall.sh
+```
+
+它只会删除确实是本 skill 的目录（或 `--link` 安装留下的符号链接），不会动无关文件。常用选项：
+
+- `--agent NAME`：限定 `codex`、`claude`、`opencode` 或 `all`。可重复。
+- `--target DIR`：移除指定的安装目录。
+- `--dry-run`：只预览将删除的内容，不实际删除。
+- `--force`：即使目标看起来不像本 skill 也强制删除。
+
+同样支持 `CODEX_SKILLS_DIR` / `CLAUDE_SKILLS_DIR` / `OPENCODE_SKILLS_DIR` 覆盖。
 
 ## 新会话恢复
 

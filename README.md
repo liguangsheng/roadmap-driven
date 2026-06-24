@@ -36,6 +36,7 @@ opencode also reads `~/.claude/skills/`, so a Claude Code install already makes 
 - `agents/openai.yaml`: Codex-only UI metadata for skill lists and default invocation.
 - `scripts/roadmap_lint.py`: checks `.agents/roadmap/` structure, statuses, links, Resume Point text, and active sprint count.
 - `install.sh`: installs the skill into one or more agent skills directories from a local or remote source, via copy or symlink, with a built-in post-install verification.
+- `uninstall.sh`: removes the skill from the agent skills directories it was installed into.
 
 ## Manual Install
 
@@ -80,6 +81,23 @@ After installation, use it per your agent (see [Supported Agents](#supported-age
 ```txt
 $roadmap-driven
 ```
+
+## Uninstall
+
+Remove the skill with the bundled `uninstall.sh`. By default it removes `roadmap-driven` from every default location it may live in (Codex, Claude Code, opencode):
+
+```bash
+./uninstall.sh
+```
+
+It only deletes a directory that is this skill (or a symlink left by a `--link` install), so unrelated files are left untouched. Useful flags:
+
+- `--agent NAME`: limit removal to `codex`, `claude`, `opencode`, or `all`. Repeatable.
+- `--target DIR`: remove a specific install directory.
+- `--dry-run`: show what would be removed without deleting anything.
+- `--force`: remove a target even if it does not look like this skill.
+
+The same `CODEX_SKILLS_DIR` / `CLAUDE_SKILLS_DIR` / `OPENCODE_SKILLS_DIR` overrides apply.
 
 ## Resuming in a New Session
 
