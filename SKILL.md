@@ -136,7 +136,7 @@ If there are no sprint files yet, set status to `draft` and write “Split when 
 
 Each sprint file must be directly executable:
 
-```markdown
+````markdown
 # Sxxx: Title
 
 Milestone: Mxx Title.
@@ -182,7 +182,7 @@ Status: planned|in-progress|blocked|done
 ## Out of Scope
 
 - ...
-```
+````
 
 The sprint `Status:` line is recommended for new sprint files. Existing roadmaps may keep status only in the milestone sprint table, but when both exist they must agree.
 
