@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate roadmap structure used by the roadmap-driven skill."""
+"""Validate roadmap structure and detect roadmap leaks outside the tree."""
 
 from __future__ import annotations
 
@@ -28,7 +28,7 @@ class Issue:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Validate roadmap layout, links, statuses, and resume points."
+        description="Validate roadmap layout, links, statuses, resume points, and external references."
     )
     parser.add_argument(
         "repo_root",
@@ -290,6 +290,47 @@ def check_milestone(
     check_resume_point(readme, text, table_order, table_status_by_file, issues)
 
 
+def is_binary(path: Path) -> bool:
+    try:
+        with path.open("rb") as f:
+            chunk = f.read(1024)
+        return b"\x00" in chunk
+    except (OSError, ValueError):
+        return True
+
+
+def check_external_roadmap_refs(
+    repo_root: Path, roadmap_root: Path, roadmap_label: str, issues: list[Issue]
+) -> None:
+    resolved_roadmap = roadmap_root.resolve()
+    resolved_repo = repo_root.resolve()
+    needle = str(Path(roadmap_label))
+    for path in sorted(resolved_repo.rglob("*")):
+        if not path.is_file():
+            continue
+        try:
+            if path.resolve() == resolved_roadmap or path.resolve().is_relative_to(resolved_roadmap):
+                continue
+        except (ValueError, OSError):
+            continue
+        if any(part.startswith(".") for part in path.relative_to(resolved_repo).parts):
+            continue
+        if is_binary(path):
+            continue
+        try:
+            text = read_text(path)
+        except (OSError, UnicodeDecodeError):
+            continue
+        if needle in text:
+            issues.append(
+                Issue(
+                    "WARN",
+                    path,
+                    f"external file references the roadmap path ({needle}); keep roadmap content inside the tree",
+                )
+            )
+
+
 def check_resume_point(
     readme: Path,
     text: str,
@@ -370,6 +411,8 @@ def main() -> int:
         issues.append(
             Issue("ERROR", roadmap_root, f"multiple in-progress sprints: {active_list}")
         )
+
+    check_external_roadmap_refs(repo_root, roadmap_root, args.roadmap, issues)
 
     errors = [issue for issue in issues if issue.severity == "ERROR"]
     warnings = [issue for issue in issues if issue.severity == "WARN"]
