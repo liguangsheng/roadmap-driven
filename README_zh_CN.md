@@ -32,7 +32,7 @@ opencode 也会读取 `~/.claude/skills/`，所以装到 Claude Code 目录后 o
 
 - `SKILL.md`：skill 定义和执行工作流（每种支持的 agent 都会读取）。
 - `agents/openai.yaml`：Codex 专用的 UI 元数据，用于 skill 列表和默认调用提示。
-- `scripts/roadmap_lint.py`：检查 `.agents/roadmap/` 的结构、状态、链接、Resume Point 和 active sprint 数量。
+- `scripts/roadmap_lint.py`：检查 `.agents/roadmap/` 的结构、状态、链接、Resume Point、active sprint 数量，并对外部引用 roadmap 路径发出警告。
 - `install.sh`：从本地或远程来源把 skill 安装到一个或多个 agent skills 目录，支持复制或符号链接，并自带安装后校验。
 - `uninstall.sh`：从已安装的 agent skills 目录中移除这个 skill。
 
@@ -107,15 +107,8 @@ $roadmap-driven
 
 ## 核心约束
 
-- Milestone 表示阶段目标和验收门槛。
-- Sprint 表示可执行、可验证、可恢复的任务切片。
-- `.agents/roadmap/` 只放 roadmap 控制面文档：根 `README.md`、milestone 目录、milestone `README.md` 和 sprint 文件；规格、设计、报告、发布说明、证据附件等放到 `docs/` 或其他合适位置再链接。
-- roadmap 内容只留在 roadmap 目录内：不得在 `.agents/roadmap/` 之外复述 milestone、sprint、状态或 Resume Point；其他文档、代码注释和提交信息只链接到 roadmap，不复制其内容。
-- 旧的 `docs/roadmap/` 视为 legacy 路径；重组 roadmap 时迁移到 `.agents/roadmap/`，除非项目明确要求继续使用旧路径。
-- 未来 milestone 在拆分成可执行 sprint 文件前保持 `draft`。
-- 执行时从第一个非 `done` sprint 恢复，并优先恢复已有的 `in-progress` sprint。
-- 执行过程中不得创建新 milestone，除非用户明确要求扩展、重规划、拆分或创建 roadmap 范围。
-- 按影响区分决策：重要或难以撤销的决策（范围、架构、依赖、安全、含糊的需求）先征询用户；小而可逆的决策按正确性优先自动决定。决策记录到 sprint 和 milestone。
-- 完成的 sprint 必须记录验证证据，并深度审计目标是否真正完成；如有缺口，保持 `in-progress` 并补齐后重新验证和审计。如果项目是 Git 仓库，还必须在进入下一个 sprint 前完成提交。
-- 创建、重组或更新 roadmap 状态后，优先运行 `scripts/roadmap_lint.py` 校验结构；如果运行不了，要手动检查同等项目并说明限制。
-- `SKILL.md` 末尾附有 **Anti-Patterns**（反模式）自检清单，列出常见失败模式（擅自加 milestone、命令过即当完成、状态不一致……）供执行时对照。
+- Milestone 是阶段目标和验收门槛；Sprint 是可执行、可验证、可恢复的任务切片。
+- `.agents/roadmap/` 只放控制面文档：根 `README.md`、milestone 目录和 sprint 文件。规格、设计、报告、证据等辅助文档放到 `docs/` 等处，再从 roadmap 链接。
+- roadmap 内容不得外泄：任何外部文档、代码注释、提交信息和项目产物都不得在 `.agents/roadmap/` 之外提及、引用或暴露 milestone/sprint 结构。
+- 状态规则、完成审计、暂停/恢复、决策路由和 Anti-Patterns 反模式清单详见 `SKILL.md`。
+- roadmap 变更后优先运行 `scripts/roadmap_lint.py`；无法运行时手动检查并说明限制。

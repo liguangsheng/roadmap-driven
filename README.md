@@ -34,7 +34,7 @@ opencode also reads `~/.claude/skills/`, so a Claude Code install already makes 
 
 - `SKILL.md`: the skill definition and operating workflow (read by every supported agent).
 - `agents/openai.yaml`: Codex-only UI metadata for skill lists and default invocation.
-- `scripts/roadmap_lint.py`: checks `.agents/roadmap/` structure, statuses, links, Resume Point text, and active sprint count.
+- `scripts/roadmap_lint.py`: checks `.agents/roadmap/` structure, statuses, links, Resume Point text, active sprint count, and warns about external references to the roadmap path.
 - `install.sh`: installs the skill into one or more agent skills directories from a local or remote source, via copy or symlink, with a built-in post-install verification.
 - `uninstall.sh`: removes the skill from the agent skills directories it was installed into.
 
@@ -109,15 +109,8 @@ Use the roadmap-driven skill and continue from the roadmap Resume Point.
 
 ## What It Enforces
 
-- Milestones represent phase goals and acceptance gates.
-- Sprints represent executable, verifiable, resumable task slices.
-- `.agents/roadmap/` contains only roadmap control-plane documents: the root `README.md`, milestone directories, milestone `README.md` files, and sprint files. Put specs, designs, reports, release notes, evidence attachments, and other auxiliary docs elsewhere under `docs/` or another appropriate project directory and link to them.
-- Roadmap content stays inside the roadmap tree: do not restate milestones, sprints, statuses, or Resume Points outside `.agents/roadmap/`. Other docs, code comments, and commit messages link to the roadmap instead of duplicating it.
-- Legacy `docs/roadmap/` is treated as a migration source. Reorganize roadmap files into `.agents/roadmap/` unless the repository explicitly opts into the old path.
-- Future milestones stay `draft` until split into executable sprint files.
-- Execution resumes from the first non-`done` sprint, preferring an existing `in-progress` sprint.
-- New milestones are not created during execution unless the user explicitly asks to expand, replan, split, or create roadmap scope.
-- Decisions are routed by impact: significant or hard-to-reverse choices (scope, architecture, dependencies, security, ambiguous requirements) are raised with the user; small, reversible ones are decided autonomously with correctness first. Decisions are recorded in the sprint and milestone.
-- Completed sprints must record validation evidence and pass a deep completion audit of the stated goal. If gaps remain, keep the sprint `in-progress`, close the gaps, then rerun validation and the audit. In Git repositories, commit before moving to the next sprint.
-- After creating, reorganizing, or updating roadmap status, run `scripts/roadmap_lint.py` when available. If it cannot run, manually check the same items and state the limitation.
-- `SKILL.md` ends with an **Anti-Patterns** checklist of common failure modes (unrequested milestones, validation-as-done, status drift, …) the agent self-checks against.
+- Milestones are phase goals and acceptance gates; sprints are executable, verifiable, resumable task slices.
+- `.agents/roadmap/` holds only control-plane documents: the root `README.md`, milestone directories, and sprint files. Specs, designs, reports, evidence, and other auxiliary docs go elsewhere under `docs/` and are linked from the roadmap.
+- Roadmap content never leaks outside `.agents/roadmap/`; external docs, code comments, commits, and artifacts must not mention, reference, or reveal milestone/sprint structure.
+- Milestone/sprint status rules, the completion audit, pause/resume behavior, decision routing, and the Anti-Patterns checklist are fully defined in `SKILL.md`.
+- After roadmap changes, run `scripts/roadmap_lint.py` when available; otherwise manually check the same items and record the limitation.
