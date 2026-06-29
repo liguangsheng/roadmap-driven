@@ -1,17 +1,13 @@
 ---
 name: roadmap-driven
-description: Use when a user wants an AI coding agent to plan, organize, or execute multi-session roadmap work using `.agents/roadmap` milestone directories, executable sprint files, validation evidence, and per-sprint commits; applies to roadmap structure, milestone/sprint mapping, draft vs planned status, implementation sequencing, pause/resume handoffs, and keeping project plans, docs, and execution evidence aligned.
+description: Use when a user wants an AI coding agent to plan, organize, execute, advance, or continue multi-session roadmap work using `.agents/roadmap` milestone directories, executable sprint files, validation evidence, and per-sprint commits. Triggered by requests about roadmap planning, sprint planning, continuing the roadmap, resuming a sprint, advancing to the next sprint, milestone/sprint status updates, 推进 roadmap, 推进 sprint, 按 roadmap 执行, 继续 milestone, or similar roadmap execution language. Applies to roadmap structure, milestone/sprint mapping, draft vs planned status, implementation sequencing, pause/resume handoffs, and keeping project plans, docs, and execution evidence aligned.
 ---
 
 # Roadmap-Driven Development
 
-Use this skill to structure and drive a project through a tree-shaped roadmap where milestones define completion gates and sprints define executable work.
+Use this skill to drive multi-step, multi-session work through a tree-shaped roadmap. Milestones are completion gates; sprints are executable, verifiable, resumable work packages for an AI coding agent. This borrows Scrum terminology but is not Scrum. Do not create roadmap structure for trivial one-shot fixes unless the user asks.
 
-This workflow borrows milestone and sprint terminology, but does not implement Scrum. Here, a sprint means an executable, verifiable, resumable work package for an AI coding agent.
-
-Use it for multi-step, multi-session, or roadmap-driven work. Do not create roadmap structure for trivial one-shot fixes unless the user asks.
-
-When this skill's bundled scripts are available, use `scripts/roadmap_lint.py` to check roadmap structure after creating, reorganizing, or updating roadmap status. If the script is unavailable or Python cannot run, perform the same checks manually and record the limitation.
+When this skill's bundled scripts are available, use `scripts/roadmap_lint.py` to check roadmap structure and detect external references to the roadmap path after creating, reorganizing, or updating roadmap status. If the script is unavailable or Python cannot run, perform the same checks manually and record the limitation.
 
 The default roadmap root is `.agents/roadmap/`. Treat `docs/roadmap/` as a legacy location unless the user or repository explicitly opts into it.
 
@@ -40,9 +36,11 @@ Recommended layout:
 
 `.agents/roadmap/` is only for roadmap control-plane documents: the root `README.md`, milestone directories, milestone `README.md` files, and sprint files named like `Sxxx-*.md`. Do not create or keep specifications, grammar docs, design docs, reports, release notes, implementation plans, evidence artifacts, status docs, feature profiles, or other auxiliary documents under `.agents/roadmap/`; put them elsewhere such as `docs/` or another appropriate project directory and link to them from the relevant milestone or sprint.
 
-Keep roadmap content inside the roadmap tree. Do not restate roadmap content—milestone goals, sprint tasks and checklists, statuses, Resume Points, or the milestone/sprint breakdown—outside `.agents/roadmap/`. Other documents, code comments, and commit messages may link or point to the roadmap location, but must not duplicate or paraphrase what it contains, so the tree stays the single source of truth and outside docs cannot drift from it.
+Keep roadmap content inside the roadmap tree. Do not mention roadmap content—milestone or sprint identifiers, milestone goals, sprint tasks and checklists, statuses, Resume Points, or the milestone/sprint breakdown—outside `.agents/roadmap/`. External documents, code comments, commit messages, and other project artifacts must treat the roadmap as an internal control plane: they may not reference, link to, duplicate, or paraphrase any roadmap content, so the tree stays the single source of truth and nothing outside it can drift.
 
 If old flat `milestones.md`, `PLAN.md`, `sprints/`, legacy `docs/roadmap/`, or other non-roadmap files exist, treat them as migration sources only. Move roadmap control-plane content into `.agents/roadmap/` when reorganizing, move non-roadmap content outside `.agents/roadmap/`, then make the tree the authority.
+
+Keep roadmap state in repo-local files rather than chat-only plans so work can pause and resume without reconstructing context.
 
 ## Milestone Creation Guard
 
@@ -85,15 +83,7 @@ Milestone status derives from sprint state:
 
 ## Roadmap README
 
-Create or update `.agents/roadmap/README.md` with:
-
-- status definitions;
-- milestone table linking to each `Mxx-*/README.md`;
-- tracking rules;
-- sprint status rules for pause/resume;
-- rule that future milestones remain `draft` until split into sprint files;
-- completion rule: sprint Done criteria, validation commands, completion audit, and milestone acceptance criteria must all pass.
-- lint rule: run the roadmap lint script when available after roadmap structure or status changes.
+Create or update `.agents/roadmap/README.md` with: status definitions, a milestone table linking to each `Mxx-*/README.md`, tracking and pause/resume guidance, the lint rule, and the rules from Status Rules and Completion Audit above.
 
 ## Milestone README Template
 
@@ -260,31 +250,20 @@ When pausing or handing off:
 4. If blocked, record the exact blocker, failed command or output summary, last safe state, and smallest user decision or external dependency needed.
 5. Do not advance later sprint statuses speculatively.
 
-## Quality Gates
-
-- Milestone acceptance criteria answer “what proves this phase is complete?”
-- Sprint Done criteria answer “what proves this task slice is complete?”
-- A milestone can be directionally useful as `draft`, but it is not executable until `planned`.
-- A milestone README must track sprint status so work can pause and resume without reconstructing context from chat.
-- Avoid detailed sprint planning for far-future milestones; it drifts before execution.
-- Prefer repo-local docs and checklists over chat-only plans.
-- Treat validation as necessary but not sufficient: each sprint must pass a target-focused completion audit before it is done, and any discovered gap must be closed inside that sprint unless it is explicitly out of scope or blocked.
-- For Git-backed projects, sprint completion is not fully durable until the verified sprint changes are committed separately from later sprint work.
-
 ## Anti-Patterns
 
 Common failure modes to self-check against; each points back to the governing rule.
 
 - Structuring trivial work: a roadmap for a one-shot fix the user didn't ask to plan. → Use the roadmap only for multi-step/multi-session work.
-- Polluting the tree: specs, designs, reports, or evidence under `.agents/roadmap/`. → Keep only control-plane docs there; link out (see Core Model).
-- Leaking roadmap content: restating milestones/sprints/statuses/Resume Points outside the tree. → Link to the roadmap, never duplicate it (see Core Model).
-- Unrequested milestones: adding milestones on a "continue"/"resume"/"按 roadmap 执行" request. → Creating milestones needs explicit user intent (see Milestone Creation Guard).
-- Premature `planned`: marking a README-only milestone `planned`. → `planned` needs at least one executable sprint (see Status Rules).
-- Status drift: the sprint `Status:` line and the milestone sprint table disagree. → Keep both consistent when both exist (see Sprint Template).
-- Validation-as-done: marking a sprint `done` because commands passed, without auditing the goal. → Pass the completion audit; close gaps inside the sprint (see Completion Audit Checklist).
-- Speculative status: advancing later sprints before working them. → Only the active sprint is `in-progress` (see When pausing or handing off).
-- Overwriting user work: editing unrelated pre-existing changes during a sprint. → Separate agent edits from user changes; leave user work untouched (see When asked to execute).
-- Far-future detail: writing detailed sprints for distant milestones. → Keep them `draft`; split only the next actionable milestone (see Quality Gates).
-- Uncommitted completion: starting the next sprint before committing the finished one in Git repositories. → Commit each done sprint separately first (see Quality Gates).
-- Silent big decision: making a hard-to-reverse, scope-, architecture-, or security-affecting choice without asking. → Ask the user first with options and a recommendation; record the resolution (see Decision Handling).
-- Blocking on trivia: asking the user about a low-impact, reversible choice. → Decide it correctness-first, proceed, and record it (see Decision Handling).
+- Polluting the tree: specs, designs, reports, or evidence under `.agents/roadmap/`. → Keep only control-plane docs there; link out.
+- Leaking roadmap content: mentioning, linking to, or restating milestones/sprints/statuses/Resume Points outside the tree. → Keep roadmap references inside `.agents/roadmap/`; external artifacts must not reveal roadmap structure.
+- Unrequested milestones: adding milestones on a "continue"/"resume"/"按 roadmap 执行" request. → Creating milestones needs explicit user intent.
+- Premature `planned`: marking a README-only milestone `planned`. → `planned` needs at least one executable sprint.
+- Status drift: the sprint `Status:` line and the milestone sprint table disagree. → Keep both consistent when both exist.
+- Validation-as-done: marking a sprint `done` because commands passed, without auditing the goal. → Pass the completion audit; close gaps inside the sprint.
+- Speculative status: advancing later sprints before working them. → Only the active sprint is `in-progress`.
+- Overwriting user work: editing unrelated pre-existing changes during a sprint. → Separate agent edits from user changes; leave user work untouched.
+- Far-future detail: writing detailed sprints for distant milestones. → Keep them `draft`; split only the next actionable milestone (see Operating Workflow).
+- Uncommitted completion: starting the next sprint before committing the finished one in Git repositories. → Commit each done sprint separately first (see Operating Workflow).
+- Silent big decision: making a hard-to-reverse, scope-, architecture-, or security-affecting choice without asking. → Ask the user first with options and a recommendation; record the resolution.
+- Blocking on trivia: asking the user about a low-impact, reversible choice. → Decide it correctness-first, proceed, and record it.

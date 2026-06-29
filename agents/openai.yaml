@@ -1,4 +1,4 @@
 interface:
   display_name: "Roadmap-Driven Development"
-  short_description: "Drive roadmap sprints with completion audits."
+  short_description: "Plan, execute, and advance roadmap-driven milestones and sprints. Responds to roadmap, sprint, continue, resume, advance, 推进, 按 roadmap 执行, and milestone/sprint status requests."
   default_prompt: "Use $roadmap-driven to organize this project in .agents/roadmap, keep draft and planned statuses honest, run roadmap lint when available, and execute the next actionable sprint with validation evidence, a completion audit, and a durable checkpoint."
